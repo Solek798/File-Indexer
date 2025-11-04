@@ -18,6 +18,7 @@ It is aimed to be a command line tool that indexes files in a directory and allo
 ## Built With
 
 - **C++20**
+- **boost::program_options** — CLI argument parsing
 
 ---
 
