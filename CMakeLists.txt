@@ -3,6 +3,7 @@ project(File_Indexer)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# TODO(FK): need to check if this works on Windows
 find_package(Boost REQUIRED COMPONENTS program_options)
 
 add_executable(File_Indexer main.cpp)

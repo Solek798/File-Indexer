@@ -23,7 +23,7 @@ It is aimed to be a command line tool that indexes files in a directory and allo
 ---
 
 ## Build Instructions
-
+> :warning: *TODO: Need to check if this works on Windows.*
 ```bash
 git clone https://github.com/Solek798/File-Indexer.git
 cd File-Indexer
