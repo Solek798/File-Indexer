@@ -24,6 +24,9 @@ protected:
 
     up<boost::regex> name_regex;
 
+    size_t min_size;
+    size_t max_size;
+
 public:
     Parameters(int argc, char** argv);
 

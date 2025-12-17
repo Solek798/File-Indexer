@@ -9,11 +9,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 
-Parameters::Parameters(int argc, char **argv)
-    : options("Allowed parameters")
+
+Parameters::Parameters(const int argc, char **argv)
+    : options("Allowed Options")
 {
     // an options_description defines what arguments can be passed to the program
-    boost::program_options::options_description options("Allowed options");
     options.add_options()
         ("help,h", "Display help message")
         ("path,p", boost::program_options::value<boost::filesystem::path>(), "Path to the folder that should be scanned")
@@ -39,6 +39,13 @@ Parameters::Parameters(int argc, char **argv)
     name_regex = map.contains("name")
                  ? std::make_unique<boost::regex>(map["name"].as<std::string>(), boost::regex::basic)
                  : nullptr;
+
+    min_size = map.contains("min-size")
+               ? map["min-size"].as<size_t>()
+               : 0;
+    max_size = map.contains("max-size")
+               ? map["max-size"].as<size_t>()
+               : 0;
 }
 
 int Parameters::check_runnable() const {
@@ -91,9 +98,20 @@ boost::filesystem::path Parameters::get_path() const {
 }
 
 bool Parameters::passes_filter(const boost::filesystem::directory_entry &entry) const {
-    const bool is_not_directory = !entry.is_directory();
-    const std::string filename = entry.path().filename().string();
-    const bool matches_name = boost::regex_match(filename, *name_regex);
+    // never pass directories
+    if (entry.is_directory())
+        return false;
 
-    return is_not_directory && matches_name;
+    // check just the name via regex
+    const std::string filename = entry.path().filename().string();
+    const bool matches_name = map.contains("name") ? boost::regex_match(filename, *name_regex) : true;
+
+    // check minimum size
+    const size_t file_size = boost::filesystem::file_size(entry.path());
+    const bool matches_min_size = map.contains("min-size") ? file_size >= min_size : true;
+
+    // check maximum size
+    const bool matches_max_size = map.contains("max-size") ? file_size <= max_size : true;
+
+    return matches_name && matches_min_size && matches_max_size;
 }
