@@ -4,10 +4,13 @@ project(File_Indexer)
 set(CMAKE_CXX_STANDARD 20)
 
 # TODO(FK): need to check if this works on Windows
-find_package(Boost REQUIRED COMPONENTS program_options filesystem)
+find_package(Boost REQUIRED COMPONENTS program_options filesystem regex)
 
 add_executable(File_Indexer main.cpp
         Parameters.cpp
-        Parameters.h)
+        Parameters.h
+        FileInfo.cpp
+        FileInfo.h
+        DefaultDefinitions.h)
 
-target_link_libraries(File_Indexer Boost::program_options Boost::filesystem)
+target_link_libraries(File_Indexer Boost::program_options Boost::filesystem Boost::regex)

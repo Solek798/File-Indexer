@@ -7,13 +7,22 @@
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include <boost/regex.hpp>
+#include "DefaultDefinitions.h"
 
+
+namespace boost::filesystem {
+    class directory_entry;
+    class path;
+}
 
 class Parameters {
 protected:
     // map where the parsed option information is stored
     boost::program_options::variables_map map;
     boost::program_options::options_description options;
+
+    up<boost::regex> name_regex;
 
 public:
     Parameters(int argc, char** argv);
@@ -26,6 +35,10 @@ public:
 
     [[nodiscard]] bool contain_help() const;
     void print_help() const;
+
+    [[nodiscard]] boost::filesystem::path get_path() const;
+
+    [[nodiscard]] bool passes_filter(const boost::filesystem::directory_entry &entry) const;
 };
 
 
