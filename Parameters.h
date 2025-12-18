@@ -30,8 +30,7 @@ protected:
 public:
     Parameters(int argc, char** argv);
 
-    // TODO(FK): make this use custom exception
-    // checks if critical parameters are present. prints error when not. returns EXIT_SUCCESS when ok.
+    // checks if critical parameters are present. throws exception if not
     void check_runnable() const;
     // debug method
     void print_available() const;
