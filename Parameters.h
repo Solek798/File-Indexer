@@ -32,7 +32,7 @@ public:
 
     // TODO(FK): make this use custom exception
     // checks if critical parameters are present. prints error when not. returns EXIT_SUCCESS when ok.
-    [[nodiscard]] int check_runnable() const;
+    void check_runnable() const;
     // debug method
     void print_available() const;
 

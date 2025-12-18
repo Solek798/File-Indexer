@@ -16,9 +16,7 @@ int main(const int argc, char** argv) {
             return EXIT_SUCCESS;
         }
 
-        const int error_code = parameters.check_runnable();
-        if (error_code != EXIT_SUCCESS)
-            return error_code;
+        parameters.check_runnable();
 
         parameters.print_available();
 

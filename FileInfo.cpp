@@ -4,7 +4,6 @@
 
 #include "FileInfo.h"
 
-#include <utility>
 
 FileInfo::FileInfo(const boost::filesystem::directory_entry &entry)
     : path(entry.path()) { }

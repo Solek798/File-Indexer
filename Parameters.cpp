@@ -5,6 +5,7 @@
 #include "Parameters.h"
 
 #include <iostream>
+#include <optional>
 #include <boost/program_options/parsers.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
@@ -19,7 +20,7 @@ Parameters::Parameters(const int argc, char **argv)
         ("path,p", boost::program_options::value<boost::filesystem::path>(), "Path to the folder that should be scanned")
         ("name,n", boost::program_options::value<std::string>(), "Name or regex of files to search for")
         ("min-size", boost::program_options::value<size_t>(), "Minimum file size in bytes")
-        ("max-size", boost::program_options::value<size_t>(), "Maximum file size in bytes (0 for no limit)")
+        ("max-size", boost::program_options::value<size_t>(), "Maximum file size in bytes")
         ("before,b", boost::program_options::value<std::string>(), "Find files modified before the given date (YYYY-MM-DD)")
         ("after,a", boost::program_options::value<std::string>(), "Find files modified after the given date (YYYY-MM-DD)");
 
@@ -48,12 +49,10 @@ Parameters::Parameters(const int argc, char **argv)
                : 0;
 }
 
-int Parameters::check_runnable() const {
+void Parameters::check_runnable() const {
     // make the program exit if there is no path...
-    if (!map.contains("path")) {
-        std::cerr << "Error: No path specified!" << std::endl;
-        return EXIT_FAILURE;
-    }
+    if (!map.contains("path"))
+        throw std::invalid_argument("Path not specified");
 
     // ...or if there are no search criteria
     const auto options_count = map.count("name") +
@@ -61,12 +60,9 @@ int Parameters::check_runnable() const {
                         map.count("max-size") +
                         map.count("before") +
                         map.count("after");
-    if (options_count <= 0) {
-        std::cerr << "Error: No search criteria specified!" << std::endl;
-        return EXIT_FAILURE;
-    }
 
-    return EXIT_SUCCESS;
+    if (options_count <= 0)
+        throw std::invalid_argument("Search criteria not specified");
 }
 
 void Parameters::print_available() const {
@@ -102,16 +98,27 @@ bool Parameters::passes_filter(const boost::filesystem::directory_entry &entry) 
     if (entry.is_directory())
         return false;
 
+    const bool check_name = map.contains("name");
+    const bool check_min_size = map.contains("min-size");
+    const bool check_max_size = map.contains("max-size");
+
+    // get data
+    const std::optional<std::string> filename = check_name
+                                            ? std::optional{entry.path().filename().string()}
+                                            : std::nullopt;
+    const std::optional<size_t> file_size = check_min_size || check_max_size
+                                            ? std::optional{boost::filesystem::file_size(entry.path())}
+                                            : std::nullopt;
+
+
     // check just the name via regex
-    const std::string filename = entry.path().filename().string();
-    const bool matches_name = map.contains("name") ? boost::regex_match(filename, *name_regex) : true;
+    const bool matches_name = check_name ? boost::regex_match(filename.value(), *name_regex) : true;
 
     // check minimum size
-    const size_t file_size = boost::filesystem::file_size(entry.path());
-    const bool matches_min_size = map.contains("min-size") ? file_size >= min_size : true;
+    const bool matches_min_size = check_min_size ? file_size.value_or(min_size) >= min_size : true;
 
     // check maximum size
-    const bool matches_max_size = map.contains("max-size") ? file_size <= max_size : true;
+    const bool matches_max_size = check_max_size ? file_size.value_or(max_size) <= max_size : true;
 
     return matches_name && matches_min_size && matches_max_size;
 }
