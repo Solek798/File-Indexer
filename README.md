@@ -18,9 +18,11 @@ It is aimed to be a command line tool that indexes files in a directory and allo
 ## Built With
 
 - **C++20**
+- **CMake 4.1**
 - **boost::program_options** — CLI argument parsing
 - **boost::filesystem** — File system operations
 - **boost::regex** — Regular expression support
+- **boost::date_time** — Date and time handling
 
 ---
 
