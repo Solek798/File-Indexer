@@ -11,6 +11,8 @@
 #include "DefaultDefinitions.h"
 
 
+enum class ESortType : uint8_t;
+
 namespace boost::filesystem {
     class directory_entry;
     class path;
@@ -19,13 +21,13 @@ namespace boost::filesystem {
 class Parameters {
 protected:
     // map where the parsed option information is stored
-    boost::program_options::variables_map map;
-    boost::program_options::options_description options;
+    boost::program_options::variables_map _map;
+    boost::program_options::options_description _options;
 
-    up<boost::regex> name_regex;
+    up<boost::regex> _name_regex;
 
-    size_t min_size;
-    size_t max_size;
+    size_t _min_size;
+    size_t _max_size;
 
 public:
     Parameters(int argc, char** argv);
@@ -39,6 +41,8 @@ public:
     void print_help() const;
 
     [[nodiscard]] boost::filesystem::path get_path() const;
+
+    [[nodiscard]] ESortType fetch_sort_type() const;
 
     [[nodiscard]] bool passes_filter(const boost::filesystem::directory_entry &entry) const;
 };

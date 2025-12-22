@@ -32,6 +32,8 @@ int main(const int argc, char** argv) {
                 files.emplace_back(entry);
         }
 
+        FileInfo::set_sort_type(parameters.fetch_sort_type());
+
         std::ranges::sort(files);
 
         for (const auto& file : files) {
